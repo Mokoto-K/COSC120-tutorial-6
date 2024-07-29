@@ -5,14 +5,8 @@ public class Dog {
     private final String name;
     private final long microchipNumber;
     private final int age;
+    private final double adoptionFee;
     private final DreamDog dreamDog;
-    private final String adoptionFee;
-//    private PureBred pureBred;
-//    private final String breed;
-//    private final Sex sex;
-//    private final DeSexed deSexed;
-//    private int minAge;
-//    private int maxAge;
 
     /**
      * constructor to create a Dog object
@@ -24,27 +18,18 @@ public class Dog {
      * @param sex             the dog's sex (male or female)
      * @param deSexed         the dog's de-sexed status - true if de-sexed, false if not
      */
-    public Dog(String name, long microchipNumber, int age, String adoptionFee, DreamDog dreamDog) {
+    public Dog(String name, long microchipNumber, int age, double adoptionFee, DreamDog dreamDog) {
         this.name = name;
         this.microchipNumber = microchipNumber;
         this.age = age;
         this.adoptionFee = adoptionFee;
-        this.dreamDog = new DreamDog(dreamDog.getMinAge(), dreamDog.getMaxAge(), dreamDog.getBreed(), dreamDog.getSex(),
-                dreamDog.getDesexed(), dreamDog.getPureBred());
+        this.dreamDog = dreamDog;
 //        this.breed=breed;
 //        this.sex=sex;
 //        this.deSexed=deSexed;
     }
 
     //getters
-
-    public String getAdoptionFee() {
-        return adoptionFee;
-    }
-
-    public DreamDog getDreamDog() {
-        return dreamDog;
-    }
 
     /**
      * @return the dog's name
@@ -67,9 +52,25 @@ public class Dog {
         return age;
     }
 
-    public String dogDescription(){
-        return this.name + " is a "+ this.age + " year old " + this.dreamDog.getDreamDescription() + "> Adoption Fee:" +
-        this.adoptionFee + "\n\n";
+    /**
+     * returns dogs price
+     * @return
+     */
+    public double getAdoptionFee() {
+        return adoptionFee;
+    }
+
+    /**
+     * Returns a dream dog?
+     * @return
+     */
+    public DreamDog getDreamDog() {
+        return dreamDog;
+    }
+
+    public String getDogDescription(){
+        return this.getName() + " is a "+ this.getAge() + " year old " + this.getDreamDog().getDreamDescription() + "> Adoption Fee:" +
+        this.getAdoptionFee() + "\n\n";
     }
 
 }

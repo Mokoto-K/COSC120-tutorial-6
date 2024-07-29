@@ -12,13 +12,14 @@ public class DreamDog {
 
     /**
      * Constructor for the dreamdog class
-     * @param minAge the min age the customer is looking for
-     * @param maxAge the max age the customer is looking for
-     * @param breed the breed the customer is looking for
-     * @param sex the sex the customer is looking for
+     *
+     * @param minAge  the min age the customer is looking for
+     * @param maxAge  the max age the customer is looking for
+     * @param breed   the breed the customer is looking for
+     * @param sex     the sex the customer is looking for
      * @param deSexed the sex the customer is looking for
      */
-    public DreamDog(int minAge, int maxAge, String breed, Sex sex, DeSexed deSexed, PureBred pureBred){
+    public DreamDog(String breed, Sex sex, DeSexed deSexed, PureBred pureBred, int minAge, int maxAge) {
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.breed = breed;
@@ -53,28 +54,26 @@ public class DreamDog {
         return desexed;
     }
 
-    public void setMinAge(int minAge) {
-        this.minAge = minAge;
-    }
-
-    public void setMaxAge(int maxAge) {
-        this.maxAge = maxAge;
-    }
-
     public String getDreamDescription() {
-        return this.sex + " " + this.pureBred + " " + this.breed + ".\n" + "> Desexed: " + this.desexed + "\n";
+        if (getPureBred().equals(PureBred.YES)) return this.getSex() + " " + this.getPureBred() + " " + this.getBreed()
+                + ".\n" + "> Desexed: " + this.getDesexed() + "\n";
+        return this.getSex() + " " + this.getBreed() + ".\n" + "> Desexed: " + this.getDesexed() + "\n";
+
     }
 
-    public boolean compareDreamsDogs(DreamDog dog) {
-        if(this.getBreed().equals(dog.getBreed())) {
-            if(this.getSex().equals(dog.getSex())) {
-                if(this.getDesexed().equals(dog.getDesexed())) {
-                    if(this.getPureBred().equals(dog.getPureBred())) {
-                        return true;
-                    }
-                }
-            }
+    public boolean compareDreamsDogs(DreamDog dogCriteria) {
+        if (!this.getBreed().equals(dogCriteria.getBreed())) {
+            return false;
         }
-        return false;
+        if (!this.getSex().equals(dogCriteria.getSex())) {
+            return false;
+        }
+        if (!this.getDesexed().equals(dogCriteria.getDesexed())) {
+            return false;
+        }
+        if (dogCriteria.getPureBred().equals(PureBred.YES) || dogCriteria.getPureBred().equals(PureBred.NO)) {
+            return this.getPureBred().equals(dogCriteria.getPureBred());
+        }
+        return true;
     }
 }

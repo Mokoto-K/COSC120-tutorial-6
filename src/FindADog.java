@@ -1,5 +1,3 @@
-
-
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,8 +32,7 @@ public class FindADog {
             Map<String,Dog> options = new HashMap<>();
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following dogs meet your criteria: \n\n");
             for (Dog potentialMatch : potentialMatches) {
-                infoToShow.append(potentialMatch.dogDescription());
-
+                infoToShow.append(potentialMatch.getDogDescription());
                 options.put(potentialMatch.getName() + " (" + potentialMatch.getMicrochipNumber() + ")", potentialMatch);
             }
             String adopt = (String) JOptionPane.showInputDialog(null,infoToShow+"\n\nPlease select which (if any) dog you'd like to adopt:","Pinkman's Pets Dog Finder", JOptionPane.QUESTION_MESSAGE,null,options.keySet().toArray(), "");
@@ -50,109 +47,6 @@ public class FindADog {
         } else JOptionPane.showMessageDialog(null, "Unfortunately none of our pooches meet your criteria :(" +
                 "\n\tTo exit, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
         System.exit(0);
-    }
-
-    /**
-     * method to get user to input name, ph num and email, with appropriate input validation
-     * @return a Person object representing the user of the program
-     */
-    private static Person getUserDetails(){
-        String name;
-        do {
-            name = JOptionPane.showInputDialog(null, "Please enter your full name.", appName, JOptionPane.QUESTION_MESSAGE);
-            if(name==null) System.exit(0);
-        } while(!isValidFullName(name));
-
-        String phoneNumber;
-        do{
-            phoneNumber = JOptionPane.showInputDialog("Please enter your phone number (10-digit number in the format 0412345678): ");
-            if(phoneNumber==null) System.exit(0);}
-        while(!isValidPhoneNumber(phoneNumber));
-
-        String email;
-        do {
-            email = JOptionPane.showInputDialog(null, "Please enter your email address.", appName, JOptionPane.QUESTION_MESSAGE);
-            if (email == null) System.exit(0);
-        }while(!isValidEmail(email));
-
-        return new Person(name, phoneNumber, email);
-    }
-
-    /**
-     * a very simple regex for full name in Firstname Surname format
-     * @param fullName the candidate full name entered by the user
-     * @return true if name matches regex/false if not
-     */
-    public static boolean isValidFullName(String fullName) {
-        String regex = "^[A-Z][a-z]+\\s[A-Z][a-zA-Z]+$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(fullName);
-        return matcher.matches();
-    }
-
-    /**
-     * a regex matcher that ensures that the user's entry starts with a 0 and is followed by 9 digits
-     * @param phoneNumber the candidate phone number entered by the user
-     * @return true if phone number matches regex/false if not
-     */
-    public static boolean isValidPhoneNumber(String phoneNumber) {
-        Pattern pattern = Pattern.compile("^0\\d{9}$");
-        Matcher matcher = pattern.matcher(phoneNumber);
-        return matcher.matches();
-    }
-
-    /**
-     * a regex matcher that ensures that the user's entry complies with RFC 5322
-     * source: <a href="https://www.baeldung.com/java-email-validation-regex">...</a>
-     * @param email the candidate email entered by the user
-     * @return true if email matches regex/false if not
-     */
-    public static boolean isValidEmail(String email) {
-        Pattern pattern = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
-
-    /**
-     * generates JOptionPanes requesting user input for dog breed, sex, de-sexed status and age
-     *
-     * @return a Dog object representing the user's desired dog criteria
-     */
-    private static DreamDog getUserCriteria(){
-        String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed.",appName, JOptionPane.QUESTION_MESSAGE,icon,allDogs.getAllBreeds().toArray(), "");
-        if(breed==null) System.exit(0);
-
-        Sex sex = (Sex) JOptionPane.showInputDialog(null,"Please select your preferred sex:",appName, JOptionPane.QUESTION_MESSAGE,icon,Sex.values(),Sex.FEMALE);
-        if(sex==null) System.exit(0);
-
-        DeSexed deSexed = (DeSexed) JOptionPane.showInputDialog(null,"Would you like your dog to be de-sexed or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,DeSexed.values(),DeSexed.YES);
-        if(deSexed==null) System.exit(0);
-
-        int minAge = -1, maxAge = -1;
-        while(minAge==-1) {
-            try {
-                minAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the youngest dog you'd like to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
-            }
-        }
-        while(maxAge<minAge) {
-            try {
-                maxAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the oldest dog you'd be willing to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
-            }
-            if(maxAge<minAge) JOptionPane.showMessageDialog(null,"Max age must be >= min age.");
-        }
-//        Dog dogCriteria = new Dog("", 0, -1, breed, sex, deSexed);
-//        dogCriteria.setMinAge(minAge);
-//        dogCriteria.setMaxAge(maxAge);
-
-        PureBred pureBred = (PureBred) JOptionPane.showInputDialog(null, "You want PUREBLOOD or not!?", null,3,null, PureBred.values(), PureBred.NA);
-
-        return new DreamDog(minAge, maxAge, breed, sex, deSexed, pureBred);
     }
 
     /**
@@ -195,20 +89,85 @@ public class FindADog {
             }
             String breed = elements[5].toLowerCase();
 
-            String adoptionFee = "0";
+            double adoptionFee = 0;
             try {
-                adoptionFee = "$"+elements[7];
+                adoptionFee = Double.parseDouble("$"+elements[7]);
             }
             catch (NumberFormatException e) {
                 System.out.println("I wouldnt write a program with 8 back to back try catches for this.... just saying.");
             }
 
             PureBred pureBred = PureBred.valueOf(elements[6]);
-            DreamDog dreamDog = new DreamDog(0,0,breed,sex, deSexed, pureBred);
+            DreamDog dreamDog = new DreamDog(breed,sex, deSexed, pureBred, 0,0);
             Dog dog = new Dog(name, microchipNumber,age, adoptionFee, dreamDog);
             allDogs.addDog(dog);
         }
         return allDogs;
+    }
+
+    /**
+     * method to get user to input name, ph num and email, with appropriate input validation
+     * @return a Person object representing the user of the program
+     */
+    private static Person getUserDetails(){
+        String name;
+        do {
+            name = JOptionPane.showInputDialog(null, "Please enter your full name.", appName, JOptionPane.QUESTION_MESSAGE);
+            if(name==null) System.exit(0);
+        } while(!isValidFullName(name));
+
+        String phoneNumber;
+        do{
+            phoneNumber = JOptionPane.showInputDialog("Please enter your phone number (10-digit number in the format 0412345678): ");
+            if(phoneNumber==null) System.exit(0);}
+        while(!isValidPhoneNumber(phoneNumber));
+
+        String email;
+        do {
+            email = JOptionPane.showInputDialog(null, "Please enter your email address.", appName, JOptionPane.QUESTION_MESSAGE);
+            if (email == null) System.exit(0);
+        }while(!isValidEmail(email));
+
+        return new Person(name, phoneNumber, email);
+    }
+
+    /**
+     * generates JOptionPanes requesting user input for dog breed, sex, de-sexed status and age
+     *
+     * @return a Dog object representing the user's desired dog criteria
+     */
+    private static DreamDog getUserCriteria(){
+        String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed.",appName, JOptionPane.QUESTION_MESSAGE,icon,allDogs.getAllBreeds().toArray(), "");
+        if(breed==null) System.exit(0);
+
+        Sex sex = (Sex) JOptionPane.showInputDialog(null,"Please select your preferred sex:",appName, JOptionPane.QUESTION_MESSAGE,icon,Sex.values(),Sex.FEMALE);
+        if(sex==null) System.exit(0);
+
+        DeSexed deSexed = (DeSexed) JOptionPane.showInputDialog(null,"Would you like your dog to be de-sexed or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,DeSexed.values(),DeSexed.YES);
+        if(deSexed==null) System.exit(0);
+
+        int minAge = -1, maxAge = -1;
+        while(minAge==-1) {
+            try {
+                minAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the youngest dog you'd like to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
+            }
+            catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
+            }
+        }
+        while(maxAge<minAge) {
+            try {
+                maxAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the oldest dog you'd be willing to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
+            }
+            catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
+            }
+            if(maxAge<minAge) JOptionPane.showMessageDialog(null,"Max age must be >= min age.");
+        }
+
+        PureBred pureBred = (PureBred) JOptionPane.showInputDialog(null, "You want PUREBLOOD or not!?", null,3,null, PureBred.values(), PureBred.NA);
+
+        return new DreamDog(breed, sex, deSexed, pureBred, minAge, maxAge);
     }
 
     /**
@@ -229,4 +188,38 @@ public class FindADog {
         }
     }
 
+    /**
+     * a very simple regex for full name in Firstname Surname format
+     * @param fullName the candidate full name entered by the user
+     * @return true if name matches regex/false if not
+     */
+    public static boolean isValidFullName(String fullName) {
+        String regex = "^[A-Z][a-z]+\\s[A-Z][a-zA-Z]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(fullName);
+        return matcher.matches();
+    }
+
+    /**
+     * a regex matcher that ensures that the user's entry starts with a 0 and is followed by 9 digits
+     * @param phoneNumber the candidate phone number entered by the user
+     * @return true if phone number matches regex/false if not
+     */
+    public static boolean isValidPhoneNumber(String phoneNumber) {
+        Pattern pattern = Pattern.compile("^0\\d{9}$");
+        Matcher matcher = pattern.matcher(phoneNumber);
+        return matcher.matches();
+    }
+
+    /**
+     * a regex matcher that ensures that the user's entry complies with RFC 5322
+     * source: <a href="https://www.baeldung.com/java-email-validation-regex">...</a>
+     * @param email the candidate email entered by the user
+     * @return true if email matches regex/false if not
+     */
+    public static boolean isValidEmail(String email) {
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 }

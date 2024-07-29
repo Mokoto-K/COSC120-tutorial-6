@@ -5,7 +5,7 @@ public enum PureBred {
         return switch (this) {
             case YES -> "Pure Bred";
             case NO -> "Mutt";
-            case NA -> "";
+            case NA -> "Don't Care";
         };
     }
 }
