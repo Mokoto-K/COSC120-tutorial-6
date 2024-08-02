@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class AllDogs {
     //fields
-    private final List<Dog> allDogs = new ArrayList<>();
+    private final List<Pet> allPets = new ArrayList<>();
 
     //default constructor used, therefore no need to declare it
 
@@ -15,8 +15,8 @@ public class AllDogs {
      * method to add a Dog object to the database (allDogs)
      * @param dog a Dog object
      */
-    public void addDog(Dog dog){
-        this.allDogs.add(dog);
+    public void addDog(Pet pet){
+        this.allPets.add(pet);
     }
 
     /**
@@ -25,8 +25,8 @@ public class AllDogs {
      */
     public Set<String> getAllBreeds(){
         Set<String> allBreeds = new HashSet<>();
-        for(Dog d: allDogs){
-            allBreeds.add(d.getDreamdog().getBreed());
+        for(Pet p: allPets){
+            allBreeds.add(p.dreamPet().getBreed());
         }
         return allBreeds;
     }
@@ -36,19 +36,19 @@ public class AllDogs {
      * @param dogCriteria a Dog object representing a user's preferred Dog
      * @return a Dog object
      */
-     public List<Dog> findMatch(DreamDog dogCriteria){
-        List<Dog> compatibleDogs = new ArrayList<>();
-        for(Dog dog: this.allDogs){
+     public List<Pet> findMatch(DreamPet petCriteria){
+        List<Pet> compatiblePets = new ArrayList<>();
+        for(Pet pet: this.allPets){
 //            if(!dog.getDreamdog().getBreed().equals(dogCriteria.getBreed())) continue;
 //            if(!dog.getDreamdog().getSex().equals(dogCriteria.getSex())) continue;
-            if(dog.getAge()<dogCriteria.getMinAge() || dog.getAge()> dogCriteria.getMaxAge()) continue;
-            if (!dog.getDreamdog().compareDreamDogs(dogCriteria)) continue;
+            if(pet.age()<petCriteria.getMinAge() || pet.age()> petCriteria.getMaxAge()) continue;
+            if (!pet.dreamPet().compareDreamPets(petCriteria)) continue;
 //            if(!dog.getDreamdog().getDeSexed().equals(dogCriteria.getDeSexed())) continue;
 //            if(!dogCriteria.getPurebred().equals(Purebred.NA)) {
 //                if(!dog.getDreamdog().getPurebred().equals(dogCriteria.getPurebred())) continue; }
-            compatibleDogs.add(dog);
+            compatiblePets.add(pet);
         }
-         return compatibleDogs;
+         return compatiblePets;
     }
 
 }

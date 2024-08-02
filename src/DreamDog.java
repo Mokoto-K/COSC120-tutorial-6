@@ -1,64 +1,33 @@
-public class DreamDog {
+public class DreamDog extends DreamPet{
 
-    private final String breed;
-    private final Sex sex;
-    private final DeSexed deSexed;
-    private final Purebred purebred;
-    private int minAge;
-    private int maxAge;
+    private final LevelOfTraining levelOfTraining;
+    private final int dailyExercise;
 
-    public DreamDog(String breed, Sex sex, DeSexed deSexed, Purebred purebred, int minAge, int maxAge) {
+    public DreamDog(String breed, Sex sex, DeSexed deSexed, Purebred purebred, int minAge, int maxAge, LevelOfTraining
+            levelOfTraining, int dailyExercise) {
 
-        this.breed = breed;
-        this.sex = sex;
-        this.deSexed = deSexed;
-        this.purebred = purebred;
-        this.minAge = minAge;
-        this.maxAge = maxAge;
+        super(breed, sex, deSexed, purebred, minAge, maxAge);
+        this.levelOfTraining = levelOfTraining;
+        this.dailyExercise = dailyExercise;
 
     }
 
-    public String getBreed() {
-        return breed;
+    public LevelOfTraining getLevelOfTraining() {
+        return levelOfTraining;
     }
 
-    public Sex getSex() {
-        return sex;
+    public int getDailyExercise() {
+        return dailyExercise;
     }
 
-    public DeSexed getDeSexed() {
-        return deSexed;
+    @Override
+    public String getDreamPetDescription() {
+        return super.getDreamPetDescription() + "\n > Level of Training: " + this.getLevelOfTraining() +
+                "\n > Daily Exercise: " + this.getDailyExercise() + " minutes \n\n";
     }
 
-    public Purebred getPurebred() { return purebred; }
-
-    public int getMinAge() {
-        return minAge;
-    }
-
-    public int getMaxAge() {
-        return maxAge;
-    }
-
-    public StringBuilder getDreamDogDescription() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(this.getSex()).append(" ");
-
-        if (this.getPurebred() == Purebred.YES) {
-            sb.append("Purebred ");
-        }
-        sb.append(this.getBreed()).append(". \n> De-Sexed: ").append(this.getDeSexed()).
-                append("\n> Adoption Fee: ");
-        return sb;
-    }
-
-    public boolean compareDreamDogs(DreamDog dogCriteria) {
-        if(!this.getBreed().equals(dogCriteria.getBreed())) return false;
-        if(!this.getSex().equals(dogCriteria.getSex())) return false;
-        if(!this.getDeSexed().equals(dogCriteria.getDeSexed())) return false;
-        if(!dogCriteria.getPurebred().equals(Purebred.NA)) {
-            if(!this.getPurebred().equals(dogCriteria.getPurebred())) return false; }
-        return true;
+    @Override
+    public boolean compareDreamPets(DreamPet petCriteria) {
+        return petCriteria instanceof DreamDog;
     }
 }

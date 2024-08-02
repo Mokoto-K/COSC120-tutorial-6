@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FindADog {
+public class FindAPet {
 
     //fields
     private final static String appName = "Pinkman's Pets Dog Finder";
@@ -26,26 +26,26 @@ public class FindADog {
         allDogs = loadDogs();
 
         JOptionPane.showMessageDialog(null, "Welcome to Pinkman's Pets Dog Finder!\n\tTo start, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
-        DreamDog dogCriteria = getUserCriteria();
-        List<Dog> potentialMatches = allDogs.findMatch(dogCriteria);
+        DreamPet petCriteria = getUserCriteria();
+        List<Pet> potentialMatches = allDogs.findMatch(petCriteria);
         if(potentialMatches.size()>0){
-            Map<String,Dog> options = new HashMap<>();
+            Map<String,Pet> options = new HashMap<>();
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following dogs meet your criteria: \n\n");
-            for (Dog potentialMatch : potentialMatches) {
+            for (Pet potentialMatch : potentialMatches) {
 //                infoToShow.append(potentialMatch.getName()).append(" (").append(potentialMatch.getMicrochipNumber()).
 //                        append(") is a ").append(potentialMatch.getAge()).append(" year old ").
 //                        append(potentialMatch.getDreamdog().getSex()).append(" ").append(potentialMatch.getDreamdog().getBreed()).
 //                        append(". \n > De-sexed: ").append(potentialMatch.getDreamdog().getDeSexed()).append("\n").
 //                        append("> Adoption fee: ").append(potentialMatch.getAdoptionFee()).append("\n\n");
-                infoToShow.append(potentialMatch.getDogDescription());
-                options.put(potentialMatch.getName() + " (" + potentialMatch.getMicrochipNumber() + ")", potentialMatch);
+                infoToShow.append(potentialMatch.toString());
+                options.put(potentialMatch.name() + " (" + potentialMatch.microchip() + ")", potentialMatch);
             }
             String adopt = (String) JOptionPane.showInputDialog(null,infoToShow+"\n\nPlease select which (if any) dog you'd like to adopt:","Pinkman's Pets Dog Finder", JOptionPane.QUESTION_MESSAGE,null,options.keySet().toArray(), "");
             if(adopt==null) System.exit(0);
             else{
-                Dog chosenDog = options.get(adopt);
+                Pet chosenPet = options.get(adopt);
                 Person applicant = getUserDetails();
-                writeAdoptionRequestToFile(applicant, chosenDog);
+                writeAdoptionRequestToFile(applicant, chosenPet);
                 JOptionPane.showMessageDialog(null, "Thank you! Your adoption request has been submitted. " +
                         "One of our friendly staff will be in touch shortly.", appName, JOptionPane.QUESTION_MESSAGE, icon);
             }
@@ -117,7 +117,7 @@ public class FindADog {
      *
      * @return a Dog object representing the user's desired dog criteria
      */
-    private static DreamDog getUserCriteria(){
+    private static DreamPet getUserCriteria(){
         String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed.",appName, JOptionPane.QUESTION_MESSAGE,icon,allDogs.getAllBreeds().toArray(), "");
         if(breed==null) System.exit(0);
 
@@ -151,8 +151,8 @@ public class FindADog {
 //        Dog dogCriteria = new Dog("", 0, -1, breed, sex, deSexed);
 //        dogCriteria.setMinAge(minAge);
 //        dogCriteria.setMaxAge(maxAge);
-        DreamDog dreamDog = new DreamDog(breed, sex, deSexed, purebred, minAge, maxAge);
-        return dreamDog;
+        DreamPet dreamPet = new DreamPet(breed, sex, deSexed, purebred, minAge, maxAge);
+        return dreamPet;
     }
 
     /**
@@ -186,10 +186,10 @@ public class FindADog {
      * @param person a Person object representing the user
      * @param dog a Dog object representing the dog that the user wants to adopt
      */
-    private static void writeAdoptionRequestToFile(Person person, Dog dog) {
+    private static void writeAdoptionRequestToFile(Person person, Pet pet) {
         String filePath = person.name().replace(" ","_")+"_adoption_request.txt";
         Path path = Path.of(filePath);
-        String lineToWrite = person.name()+" wishes to adopt "+dog.getName()+" ("+dog.getMicrochipNumber()+
+        String lineToWrite = person.name()+" wishes to adopt "+pet.name()+" ("+pet.microchip()+
                 "). Their phone number is 0"+person.phoneNumber()+" and their email address is "+person.emailAddress();
         try {
             Files.writeString(path, lineToWrite);
