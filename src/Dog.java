@@ -1,36 +1,39 @@
 
-
 public class Dog {
     //fields
     private final String name;
     private final long microchipNumber;
     private final int age;
+    private final DreamDog dreamdog;
     private final double adoptionFee;
-    private final DreamDog dreamDog;
+//    private final String breed;
+//    private final Sex sex;
+//    private final DeSexed deSexed;
+//    private int minAge;
+//    private int maxAge;
 
     /**
      * constructor to create a Dog object
-     *
-     * @param name            the dog's name
+     * @param name the dog's name
      * @param microchipNumber the dog's microchip number - unique 9-digit number
-     * @param age             the dog's age in years
-     * @param breed           the dog's breed
-     * @param sex             the dog's sex (male or female)
-     * @param deSexed         the dog's de-sexed status - true if de-sexed, false if not
+     * @param age the dog's age in years
+     * @param breed the dog's breed
+     * @param sex the dog's sex (male or female)
+     * @param deSexed the dog's de-sexed status - true if de-sexed, false if not
      */
-    public Dog(String name, long microchipNumber, int age, double adoptionFee, DreamDog dreamDog) {
-        this.name = name;
-        this.microchipNumber = microchipNumber;
-        this.age = age;
+    public Dog(String name, long microchipNumber, int age, double adoptionFee, DreamDog dreamDog){
+        this.name=name;
+        this.microchipNumber=microchipNumber;
+        this.age=age;
+        this.dreamdog = dreamDog;
         this.adoptionFee = adoptionFee;
-        this.dreamDog = dreamDog;
+//        this.dreamDog(breed, sex, deSexed, 0, 0);
 //        this.breed=breed;
 //        this.sex=sex;
 //        this.deSexed=deSexed;
     }
 
     //getters
-
     /**
      * @return the dog's name
      */
@@ -52,30 +55,11 @@ public class Dog {
         return age;
     }
 
-    /**
-     * returns dogs price
-     * @return
-     */
-    public double getAdoptionFee() {
-        return adoptionFee;
-    }
+    public DreamDog getDreamdog() {return dreamdog; }
 
-    /**
-     * Returns a dream dog?
-     * @return
-     */
-    public DreamDog getDreamDog() {
-        return dreamDog;
-    }
+    public double getAdoptionFee() {return adoptionFee; }
 
-    public String getDogDescription(){
-        return this.getName() + " is a "+ this.getAge() + " year old " + this.getDreamDog().getDreamDescription() + "> Adoption Fee:" +
-        this.getAdoptionFee() + "\n\n";
-    }
-
-}
-
-//    /**
+    //    /**
 //     * @return the dog's breed
 //     */
 //    public String getBreed() {
@@ -116,4 +100,11 @@ public class Dog {
 //    public int getMaxAge() {
 //        return maxAge;
 //    }
-//}
+
+    public StringBuilder getDogDescription() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getName()).append(" (").append(this.getMicrochipNumber()).append(") is a ").append(this.getAge()).
+                append(" year old ").append(this.dreamdog.getDreamDogDescription()).append(this.adoptionFee).append("\n\n");
+        return sb;
+    }
+}

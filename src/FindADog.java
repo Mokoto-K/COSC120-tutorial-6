@@ -12,7 +12,7 @@ public class FindADog {
 
     //fields
     private final static String appName = "Pinkman's Pets Dog Finder";
-    private final static String filePath = "./allDogs.txt";
+    private final static String filePath = "./allDogs-2.txt";
     private final static String iconPath = "./icon.jpg";
 
     private static final ImageIcon icon = new ImageIcon(iconPath);
@@ -28,10 +28,15 @@ public class FindADog {
         JOptionPane.showMessageDialog(null, "Welcome to Pinkman's Pets Dog Finder!\n\tTo start, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
         DreamDog dogCriteria = getUserCriteria();
         List<Dog> potentialMatches = allDogs.findMatch(dogCriteria);
-        if(!potentialMatches.isEmpty()){
+        if(potentialMatches.size()>0){
             Map<String,Dog> options = new HashMap<>();
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following dogs meet your criteria: \n\n");
             for (Dog potentialMatch : potentialMatches) {
+//                infoToShow.append(potentialMatch.getName()).append(" (").append(potentialMatch.getMicrochipNumber()).
+//                        append(") is a ").append(potentialMatch.getAge()).append(" year old ").
+//                        append(potentialMatch.getDreamdog().getSex()).append(" ").append(potentialMatch.getDreamdog().getBreed()).
+//                        append(". \n > De-sexed: ").append(potentialMatch.getDreamdog().getDeSexed()).append("\n").
+//                        append("> Adoption fee: ").append(potentialMatch.getAdoptionFee()).append("\n\n");
                 infoToShow.append(potentialMatch.getDogDescription());
                 options.put(potentialMatch.getName() + " (" + potentialMatch.getMicrochipNumber() + ")", potentialMatch);
             }
@@ -89,20 +94,65 @@ public class FindADog {
             }
             String breed = elements[5].toLowerCase();
 
-            double adoptionFee = 0;
-            try {
-                adoptionFee = Double.parseDouble("$"+elements[7]);
-            }
-            catch (NumberFormatException e) {
-                System.out.println("I wouldnt write a program with 8 back to back try catches for this.... just saying.");
-            }
+            Purebred purebred = Purebred.valueOf(elements[6].toUpperCase());
 
-            PureBred pureBred = PureBred.valueOf(elements[6]);
-            DreamDog dreamDog = new DreamDog(breed,sex, deSexed, pureBred, 0,0);
-            Dog dog = new Dog(name, microchipNumber,age, adoptionFee, dreamDog);
+            double adoptionFee = 0;
+            try{
+                adoptionFee = Double.parseDouble(elements[7]);
+            }catch (NumberFormatException n){
+                System.out.println("Error in file. Adoption Fee could not be parsed for dog on line "+(i+1)+". Terminating. \nError message: "+n.getMessage());
+                System.exit(0);
+            }
+            DreamDog dreamDog = new DreamDog(breed, sex, deSexed, purebred, 0, 0);
+            Dog dog = new Dog(name, microchipNumber, age, adoptionFee, dreamDog);
             allDogs.addDog(dog);
         }
+
+
         return allDogs;
+    }
+
+    /**
+     * generates JOptionPanes requesting user input for dog breed, sex, de-sexed status and age
+     *
+     * @return a Dog object representing the user's desired dog criteria
+     */
+    private static DreamDog getUserCriteria(){
+        String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed.",appName, JOptionPane.QUESTION_MESSAGE,icon,allDogs.getAllBreeds().toArray(), "");
+        if(breed==null) System.exit(0);
+
+        Sex sex = (Sex) JOptionPane.showInputDialog(null,"Please select your preferred sex:",appName, JOptionPane.QUESTION_MESSAGE,icon,Sex.values(),Sex.FEMALE);
+        if(sex==null) System.exit(0);
+
+        DeSexed deSexed = (DeSexed) JOptionPane.showInputDialog(null,"Would you like your dog to be de-sexed or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,DeSexed.values(),DeSexed.YES);
+        if(deSexed==null) System.exit(0);
+
+        Purebred purebred = (Purebred) JOptionPane.showInputDialog(null,"Would you like your dog to be Purebred or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,Purebred.values(),Purebred.YES);
+        if(purebred==null) System.exit(0);
+
+        int minAge = -1, maxAge = -1;
+        while(minAge==-1) {
+            try {
+                minAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the youngest dog you'd like to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
+            }
+            catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
+            }
+        }
+        while(maxAge<minAge) {
+            try {
+                maxAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the oldest dog you'd be willing to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
+            }
+            catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
+            }
+            if(maxAge<minAge) JOptionPane.showMessageDialog(null,"Max age must be >= min age.");
+        }
+//        Dog dogCriteria = new Dog("", 0, -1, breed, sex, deSexed);
+//        dogCriteria.setMinAge(minAge);
+//        dogCriteria.setMaxAge(maxAge);
+        DreamDog dreamDog = new DreamDog(breed, sex, deSexed, purebred, minAge, maxAge);
+        return dreamDog;
     }
 
     /**
@@ -129,45 +179,6 @@ public class FindADog {
         }while(!isValidEmail(email));
 
         return new Person(name, phoneNumber, email);
-    }
-
-    /**
-     * generates JOptionPanes requesting user input for dog breed, sex, de-sexed status and age
-     *
-     * @return a Dog object representing the user's desired dog criteria
-     */
-    private static DreamDog getUserCriteria(){
-        String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed.",appName, JOptionPane.QUESTION_MESSAGE,icon,allDogs.getAllBreeds().toArray(), "");
-        if(breed==null) System.exit(0);
-
-        Sex sex = (Sex) JOptionPane.showInputDialog(null,"Please select your preferred sex:",appName, JOptionPane.QUESTION_MESSAGE,icon,Sex.values(),Sex.FEMALE);
-        if(sex==null) System.exit(0);
-
-        DeSexed deSexed = (DeSexed) JOptionPane.showInputDialog(null,"Would you like your dog to be de-sexed or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,DeSexed.values(),DeSexed.YES);
-        if(deSexed==null) System.exit(0);
-
-        int minAge = -1, maxAge = -1;
-        while(minAge==-1) {
-            try {
-                minAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the youngest dog you'd like to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
-            }
-        }
-        while(maxAge<minAge) {
-            try {
-                maxAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the oldest dog you'd be willing to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
-            }
-            if(maxAge<minAge) JOptionPane.showMessageDialog(null,"Max age must be >= min age.");
-        }
-
-        PureBred pureBred = (PureBred) JOptionPane.showInputDialog(null, "You want PUREBLOOD or not!?", null,3,null, PureBred.values(), PureBred.NA);
-
-        return new DreamDog(breed, sex, deSexed, pureBred, minAge, maxAge);
     }
 
     /**
@@ -222,4 +233,5 @@ public class FindADog {
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
     }
+
 }

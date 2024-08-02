@@ -26,7 +26,7 @@ public class AllDogs {
     public Set<String> getAllBreeds(){
         Set<String> allBreeds = new HashSet<>();
         for(Dog d: allDogs){
-            allBreeds.add(d.getDreamDog().getBreed());
+            allBreeds.add(d.getDreamdog().getBreed());
         }
         return allBreeds;
     }
@@ -39,10 +39,14 @@ public class AllDogs {
      public List<Dog> findMatch(DreamDog dogCriteria){
         List<Dog> compatibleDogs = new ArrayList<>();
         for(Dog dog: this.allDogs){
+//            if(!dog.getDreamdog().getBreed().equals(dogCriteria.getBreed())) continue;
+//            if(!dog.getDreamdog().getSex().equals(dogCriteria.getSex())) continue;
             if(dog.getAge()<dogCriteria.getMinAge() || dog.getAge()> dogCriteria.getMaxAge()) continue;
-            if (dog.getDreamDog().compareDreamsDogs(dogCriteria)) {
-                compatibleDogs.add(dog);
-            }
+            if (!dog.getDreamdog().compareDreamDogs(dogCriteria)) continue;
+//            if(!dog.getDreamdog().getDeSexed().equals(dogCriteria.getDeSexed())) continue;
+//            if(!dogCriteria.getPurebred().equals(Purebred.NA)) {
+//                if(!dog.getDreamdog().getPurebred().equals(dogCriteria.getPurebred())) continue; }
+            compatibleDogs.add(dog);
         }
          return compatibleDogs;
     }
