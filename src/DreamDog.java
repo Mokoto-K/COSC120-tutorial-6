@@ -1,7 +1,7 @@
 public class DreamDog extends DreamPet{
 
-    private final LevelOfTraining levelOfTraining;
-    private final int dailyExercise;
+    private LevelOfTraining levelOfTraining;
+    private int dailyExercise;
 
     public DreamDog(String breed, Sex sex, DeSexed deSexed, Purebred purebred, int minAge, int maxAge, LevelOfTraining
             levelOfTraining, int dailyExercise) {
@@ -10,6 +10,14 @@ public class DreamDog extends DreamPet{
         this.levelOfTraining = levelOfTraining;
         this.dailyExercise = dailyExercise;
 
+    }
+
+    public DreamDog(String breed, Sex sex, DeSexed deSexed, Purebred purebred, int minAge, int maxAge) {
+        super(breed, sex, deSexed, purebred, minAge, maxAge);
+    }
+
+    public DreamDog(String breed, Sex sex, DeSexed deSexed, Purebred purebred) {
+        super(breed, sex, deSexed, purebred);
     }
 
     public LevelOfTraining getLevelOfTraining() {

@@ -7,6 +7,11 @@ public class DreamCat extends DreamPet{
         this.hair = hair;
     }
 
+    public DreamCat(String breed, Sex sex, DeSexed deSexed, Purebred purebred, Hair hair) {
+        super(breed, sex, deSexed, purebred);
+        this.hair = hair;
+    }
+
     public Hair getHair() {
         return hair;
     }

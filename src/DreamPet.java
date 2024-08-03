@@ -17,6 +17,14 @@ public class DreamPet {
         this.maxAge = maxAge;
     }
 
+    public DreamPet(String breed, Sex sex, DeSexed deSexed, Purebred purebred) {
+
+        this.breed = breed;
+        this.sex = sex;
+        this.deSexed = deSexed;
+        this.purebred = purebred;
+    }
+
     public String getBreed() {
         return breed;
     }
@@ -56,7 +64,8 @@ public class DreamPet {
     }
 
     public boolean compareDreamPets(DreamPet petCriteria) {
-        if(!this.getBreed().equals(petCriteria.getBreed())) return false;
+        if (!petCriteria.getBreed().equals("NA")) {
+            if (!this.getBreed().equals(petCriteria.getBreed())) return false; }
         if(!this.getSex().equals(petCriteria.getSex())) return false;
         if(!this.getDeSexed().equals(petCriteria.getDeSexed())) return false;
         if(!petCriteria.getPurebred().equals(Purebred.NA)) {

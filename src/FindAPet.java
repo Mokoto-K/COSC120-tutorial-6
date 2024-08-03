@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,130 +11,82 @@ import java.util.regex.Pattern;
 
 public class FindAPet {
 
-    //fields
-    private final static String appName = "Pinkman's Pets Dog Finder";
-    private final static String filePath = "./allDogs-2.txt";
-    private final static String iconPath = "./icon.jpg";
+    private static final String filePath = "./allPets.txt";
+    private static final String appName = "Poop";
+    private static AllPets allPets;
 
-    private static final ImageIcon icon = new ImageIcon(iconPath);
-    private static AllDogs allDogs;
-
-    /**
-     * main method used to allow the user to search Pinkman's database of dogs, and place an adoption request
-     * @param args none required
-     */
     public static void main(String[] args) {
-        allDogs = loadDogs();
+    allPets = loadPets();
+    // aware this needs input protection but dont care this second
+    String type = JOptionPane.showInputDialog("You want cat or dog bruv?");
+    DreamPet dreamPet = getUserCriteria(type);
+    processSearchResults(dreamPet);
 
-        JOptionPane.showMessageDialog(null, "Welcome to Pinkman's Pets Dog Finder!\n\tTo start, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
-        DreamPet petCriteria = getUserCriteria();
-        List<Pet> potentialMatches = allDogs.findMatch(petCriteria);
-        if(potentialMatches.size()>0){
-            Map<String,Pet> options = new HashMap<>();
-            StringBuilder infoToShow = new StringBuilder("Matches found!! The following dogs meet your criteria: \n\n");
-            for (Pet potentialMatch : potentialMatches) {
-//                infoToShow.append(potentialMatch.getName()).append(" (").append(potentialMatch.getMicrochipNumber()).
-//                        append(") is a ").append(potentialMatch.getAge()).append(" year old ").
-//                        append(potentialMatch.getDreamdog().getSex()).append(" ").append(potentialMatch.getDreamdog().getBreed()).
-//                        append(". \n > De-sexed: ").append(potentialMatch.getDreamdog().getDeSexed()).append("\n").
-//                        append("> Adoption fee: ").append(potentialMatch.getAdoptionFee()).append("\n\n");
-                infoToShow.append(potentialMatch.toString());
-                options.put(potentialMatch.name() + " (" + potentialMatch.microchip() + ")", potentialMatch);
-            }
-            String adopt = (String) JOptionPane.showInputDialog(null,infoToShow+"\n\nPlease select which (if any) dog you'd like to adopt:","Pinkman's Pets Dog Finder", JOptionPane.QUESTION_MESSAGE,null,options.keySet().toArray(), "");
-            if(adopt==null) System.exit(0);
-            else{
-                Pet chosenPet = options.get(adopt);
-                Person applicant = getUserDetails();
-                writeAdoptionRequestToFile(applicant, chosenPet);
-                JOptionPane.showMessageDialog(null, "Thank you! Your adoption request has been submitted. " +
-                        "One of our friendly staff will be in touch shortly.", appName, JOptionPane.QUESTION_MESSAGE, icon);
-            }
-        } else JOptionPane.showMessageDialog(null, "Unfortunately none of our pooches meet your criteria :(" +
-                "\n\tTo exit, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
-        System.exit(0);
     }
 
-    /**
-     * method to load all dog data from file, storing it as Dog objects in an instance of AllDogs
-     * @return an AllDogs object - functions as database of Dogs, with associated methods
-     */
-    private static AllDogs loadDogs() {
-        AllDogs allDogs = new AllDogs();
+    private static AllPets loadPets() {
+        AllPets allPets = new AllPets();
         Path path = Path.of(filePath);
 
-        List<String> dogData = null;
-        try{
-            dogData = Files.readAllLines(path);
-        }catch (IOException io){
-            System.out.println("Could not load the file. \nError message: "+io.getMessage());
-            System.exit(0);
+        List<String> petData = null;
+        try {
+            petData = Files.readAllLines(path);
+        } catch (IOException e){
+            System.out.println("Your shit broke dawg");
         }
+        // Improvement for assignment could be wrapping this whole hting in a try catch and just output problem with data
+        for (String line : petData) {
+            String[] element = line.split(",");
+            String type = element[0];
+            String name = element[1];
+            long microchip = Long.parseLong(element[2]);
+            Sex sex = Sex.valueOf(element[3]);
+            DeSexed deSexed = DeSexed.valueOf(element[4]);
+            int age = Integer.parseInt(element[5]);
+            String breed = element[6];
+            Purebred purebred = Purebred.valueOf(element[7]);
+            float adoptionFee = Float.parseFloat(element[8]);
+            Hair hairless = Hair.valueOf(element[9]);
+            LevelOfTraining training = LevelOfTraining.valueOf(element[10]);
+            int exercise = Integer.parseInt(element[11]);
 
-        for (int i=1;i<dogData.size();i++) {
-            String[] elements = dogData.get(i).split(",");
-            String name = elements[0];
-            long microchipNumber = 0;
-            try{
-                microchipNumber = Long.parseLong(elements[1]);
+            if (type.equalsIgnoreCase("cat")) {
+                DreamCat dreamCat = new DreamCat(breed, sex, deSexed, purebred, 0, 0, hairless);
+                Pet pet = new Pet(name, microchip, age, dreamCat, adoptionFee);
+                allPets.addPet(pet);
             }
-            catch (NumberFormatException n){
-                System.out.println("Error in file. Microchip number could not be parsed for dog on line "+(i+1)+". Terminating. \nError message: "+n.getMessage());
-                System.exit(0);
+            else {
+                DreamDog dreamDog = new DreamDog(breed, sex, deSexed, purebred, 0, 0, training, exercise);
+                Pet pet = new Pet(name, microchip, age, dreamDog, adoptionFee);
+                allPets.addPet(pet);
             }
-
-            Sex sex = Sex.valueOf(elements[2].toUpperCase());
-            DeSexed deSexed = DeSexed.valueOf(elements[3].toUpperCase());
-
-            int age = 0;
-            try{
-                age = Integer.parseInt(elements[4]);
-            }catch (NumberFormatException n){
-                System.out.println("Error in file. Age could not be parsed for dog on line "+(i+1)+". Terminating. \nError message: "+n.getMessage());
-                System.exit(0);
-            }
-            String breed = elements[5].toLowerCase();
-
-            Purebred purebred = Purebred.valueOf(elements[6].toUpperCase());
-
-            double adoptionFee = 0;
-            try{
-                adoptionFee = Double.parseDouble(elements[7]);
-            }catch (NumberFormatException n){
-                System.out.println("Error in file. Adoption Fee could not be parsed for dog on line "+(i+1)+". Terminating. \nError message: "+n.getMessage());
-                System.exit(0);
-            }
-            DreamDog dreamDog = new DreamDog(breed, sex, deSexed, purebred, 0, 0);
-            Dog dog = new Dog(name, microchipNumber, age, adoptionFee, dreamDog);
-            allDogs.addDog(dog);
         }
-
-
-        return allDogs;
+        return allPets;
     }
 
-    /**
-     * generates JOptionPanes requesting user input for dog breed, sex, de-sexed status and age
-     *
-     * @return a Dog object representing the user's desired dog criteria
-     */
-    private static DreamPet getUserCriteria(){
-        String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed.",appName, JOptionPane.QUESTION_MESSAGE,icon,allDogs.getAllBreeds().toArray(), "");
+    private static DreamPet getUserCriteria(String type) {
+
+        String breed  = (String) JOptionPane.showInputDialog(null,"Please select your preferred breed."
+                ,appName, JOptionPane.QUESTION_MESSAGE,null,allPets.getAllBreeds(type).toArray(), "");
         if(breed==null) System.exit(0);
 
-        Sex sex = (Sex) JOptionPane.showInputDialog(null,"Please select your preferred sex:",appName, JOptionPane.QUESTION_MESSAGE,icon,Sex.values(),Sex.FEMALE);
+        Sex sex = (Sex) JOptionPane.showInputDialog(null,"Please select your preferred sex:",
+                appName, JOptionPane.QUESTION_MESSAGE,null,Sex.values(),Sex.FEMALE);
         if(sex==null) System.exit(0);
 
-        DeSexed deSexed = (DeSexed) JOptionPane.showInputDialog(null,"Would you like your dog to be de-sexed or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,DeSexed.values(),DeSexed.YES);
+        DeSexed deSexed = (DeSexed) JOptionPane.showInputDialog(null,"Would you like your dog " +
+                "to be de-sexed or not?",appName, JOptionPane.QUESTION_MESSAGE,null,DeSexed.values(),DeSexed.YES);
         if(deSexed==null) System.exit(0);
 
-        Purebred purebred = (Purebred) JOptionPane.showInputDialog(null,"Would you like your dog to be Purebred or not?",appName, JOptionPane.QUESTION_MESSAGE,icon,Purebred.values(),Purebred.YES);
+        Purebred purebred = (Purebred) JOptionPane.showInputDialog(null,"Would you like your " +
+                "dog to be Purebred or not?",appName, JOptionPane.QUESTION_MESSAGE,null,Purebred.values(),Purebred.YES);
         if(purebred==null) System.exit(0);
 
         int minAge = -1, maxAge = -1;
         while(minAge==-1) {
             try {
-                minAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the youngest dog you'd like to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
+                minAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age " +
+                        "(years) of the youngest dog you'd like to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
             }
             catch (NumberFormatException e){
                 JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
@@ -141,25 +94,53 @@ public class FindAPet {
         }
         while(maxAge<minAge) {
             try {
-                maxAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age (years) of the oldest dog you'd be willing to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
+                maxAge = Integer.parseInt(JOptionPane.showInputDialog(null,"What is the age " +
+                        "(years) of the oldest dog you'd be willing to adopt ",appName,JOptionPane.QUESTION_MESSAGE));
             }
             catch (NumberFormatException e){
                 JOptionPane.showMessageDialog(null,"Invalid input. Please try again.");
             }
             if(maxAge<minAge) JOptionPane.showMessageDialog(null,"Max age must be >= min age.");
         }
-//        Dog dogCriteria = new Dog("", 0, -1, breed, sex, deSexed);
-//        dogCriteria.setMinAge(minAge);
-//        dogCriteria.setMaxAge(maxAge);
-        DreamPet dreamPet = new DreamPet(breed, sex, deSexed, purebred, minAge, maxAge);
+
+        DreamPet dreamPet;
+        if (type.equalsIgnoreCase("cat")) {
+            Hair hairless = (Hair) JOptionPane.showInputDialog(null,"Would you like a baldie " +
+                    "or not?",appName, JOptionPane.QUESTION_MESSAGE,null,Hair.values(),Hair.HAIRLESS);
+            if(hairless==null) System.exit(0);
+            dreamPet = new DreamCat(breed, sex, deSexed, purebred,minAge, maxAge, hairless);
+        } else {
+            dreamPet = new DreamDog(breed, sex, deSexed, purebred,minAge, maxAge);
+        }
         return dreamPet;
     }
 
-    /**
-     * method to get user to input name, ph num and email, with appropriate input validation
-     * @return a Person object representing the user of the program
-     */
-    private static Person getUserDetails(){
+    private static void processSearchResults(DreamPet userDreamPet) {
+        List<Pet> allMatches = allPets.findMatch(userDreamPet);
+        if(!allMatches.isEmpty()){
+            Map<String,Pet> options = new HashMap<>();
+            StringBuilder infoToShow = new StringBuilder("Matches found!! The following dogs meet your criteria: \n\n");
+            for (Pet allMatch : allMatches) {
+                infoToShow.append(allMatch.toString());
+                options.put(allMatch.name() + " (" + allMatch.microchip() + ")", allMatch);
+            }
+            String adopt = (String) JOptionPane.showInputDialog(null,infoToShow+"\n\nPlease " +
+                    "select which (if any) dog you'd like to adopt:","Pinkman's Pets Dog Finder",
+                    JOptionPane.QUESTION_MESSAGE,null,options.keySet().toArray(), "");
+            if(adopt==null) System.exit(0);
+            else{
+                Pet chosenPet = options.get(adopt);
+                Person applicant = getUserDetails();
+                writeAdoptionRequestToFile(applicant, chosenPet);
+                JOptionPane.showMessageDialog(null, "Thank you! Your adoption request has been submitted. " +
+                        "One of our friendly staff will be in touch shortly.", appName, JOptionPane.QUESTION_MESSAGE, null);
+            }
+        } else JOptionPane.showMessageDialog(null, "Unfortunately none of our pooches meet your criteria :(" +
+                "\n\tTo exit, click OK.", appName, JOptionPane.QUESTION_MESSAGE, null);
+        System.exit(0);
+    }
+
+    private static Person getUserDetails() {
         String name;
         do {
             name = JOptionPane.showInputDialog(null, "Please enter your full name.", appName, JOptionPane.QUESTION_MESSAGE);
@@ -181,11 +162,6 @@ public class FindAPet {
         return new Person(name, phoneNumber, email);
     }
 
-    /**
-     * provides Pinkman's Pets with a file containing the user's adoption request
-     * @param person a Person object representing the user
-     * @param dog a Dog object representing the dog that the user wants to adopt
-     */
     private static void writeAdoptionRequestToFile(Person person, Pet pet) {
         String filePath = person.name().replace(" ","_")+"_adoption_request.txt";
         Path path = Path.of(filePath);
@@ -233,5 +209,4 @@ public class FindAPet {
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
     }
-
 }
