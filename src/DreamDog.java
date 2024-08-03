@@ -36,6 +36,9 @@ public class DreamDog extends DreamPet{
 
     @Override
     public boolean compareDreamPets(DreamPet petCriteria) {
-        return petCriteria instanceof DreamDog;
+        if (petCriteria instanceof DreamDog) {
+            return super.compareDreamPets(petCriteria);
+        }
+        return false;
     }
 }

@@ -18,8 +18,11 @@ public class DreamCat extends DreamPet{
 
     @Override
     public boolean compareDreamPets(DreamPet petCriteria) {
-        if (petCriteria instanceof DreamCat) {
-            return this.getHair().equals(((DreamCat) petCriteria).getHair());
+        if (petCriteria instanceof DreamCat cat) {
+            if (!super.compareDreamPets(petCriteria)) return false;
+
+            if (cat.getHair().equals(Hair.NA)) return true;
+            return this.getHair().equals(cat.getHair());
         }
         return false;
     }

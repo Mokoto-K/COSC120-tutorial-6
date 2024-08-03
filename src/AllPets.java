@@ -13,6 +13,8 @@ public class AllPets {
 
     public Set<String> getAllBreeds(String animal) {
         Set<String> allBreeds = new HashSet<>();
+
+        // tutorial has a different way of doing this, look for ass when doing ass
         if (animal.equals("Cat")) {
             for(Pet pet : allPets) {
                 if (pet.dreamPet() instanceof DreamCat) {
